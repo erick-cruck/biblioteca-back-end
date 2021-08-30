@@ -10,15 +10,19 @@ mongoose.connect('mongodb://localhost:27017/BibliotecaVirtualDB', {useNewUrlPars
     .then(()=>{
         console.log('Estas conectado a la base de datos')
 
+        var name = 'ADMIN'
         var user1 = 'adminpractica'
         var email = 'adminpractica'
+        var img = 'https://e7.pngegg.com/pngimages/504/457/png-clipart-computer-icons-icon-public-library-books-miscellaneous-presentation.png'
         var password = 'adminpractica'
         var rol = 'ROL_ADMIN'
 
         var userModel = new User()
 
+        userModel.name = name
         userModel.user = user1
         userModel.email = email
+        userModel.img = img
         userModel.rol = rol
 
         User.find({email: userModel.email}).exec((err, userStored)=>{
