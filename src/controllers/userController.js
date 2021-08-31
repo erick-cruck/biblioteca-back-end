@@ -5,20 +5,22 @@ var bcrypt = require('bcrypt-nodejs')
 var jwt = require('../services/jwt')
 const { response } = require('express')
 const { findById } = require('../models/user')
+const user = require('../models/user')
 
 function registerUser(req, res){
     var userModel = new User()
-    var params = req.body
+    var params = req.body;
 
-    if(params.user && params.email && params.password && params.carnet){
+    if(params.user && params.email && params.password && params.dpi){
 
         userModel.name = params.name
         userModel.surname = params.surname
         userModel.user = params.user
         userModel.email = params.email
-        userModel.rol = params.rol
+        userModel.rol = 'ROL_USUARIO'
         userModel.img = 'http://assets.stickpng.com/images/585e4beacb11b227491c3399.png'
-        userModel.carnet = params.carnet
+        userModel.estado =  params.estado
+        userModel.dpi = params.dpi
 
         User.find({
             $or:[
@@ -32,7 +34,7 @@ function registerUser(req, res){
             }else{
                 bcrypt.hash(params.password, null, null, (err, bcryptPassword)=>{
                     userModel.password = bcryptPassword
-
+                
                     userModel.save((err, userSave)=>{
                         if(err) return res.status(500).send({mensaje: 'Error en la peticion'})
                         if(userSave){
@@ -133,10 +135,6 @@ function getUsers(req, res){
 function getUserId(req, res){
     var userId = req.params.idU
 
-    if(userId != req.user.sub){
-        return res.status(500).send({mensaje: 'No tienes permisos para editar este usuario'})
-    }
-
     User.findOne({ $or: [{ _id: userId }] }).exec ((err, userStored)=>{
         if(err) return res.status(400).send({mensaje: 'Error en la peticion'})
         if(!userStored) return res.status(404).send({mensaje: 'Error al obtener los datos del usuario'})
@@ -147,12 +145,12 @@ function getUserId(req, res){
 
 function getUserIdAdmin(req, res){
     var userId = req.params.idU
-
+    
     if (req.user.rol != "ROL_ADMIN") {
         return res.status(500).send({ mensaje: "Solo el Administrador puede ver a otro usuario" })
     }
 
-    User.findOne({ $or: [{ _id: userId }] }).exec ((err, userStored)=>{
+    User.find().exec ((err, userStored)=>{
         if(err) return res.status(400).send({mensaje: 'Error en la peticion'})
         if(!userStored) return res.status(404).send({mensaje: 'Error al obtener los datos del usuario'})
 
@@ -161,24 +159,26 @@ function getUserIdAdmin(req, res){
 }
 
 function updateUserAdmin(req, res){
+    var idUsuario = req.params.idUsuario;
+    var params = req.body;
 
-    if (req.user.rol != "ROL_ADMIN") {
-        return res.status(500).send({ mensaje: "Solo el Administrador puede editar otros usuarios" })
+    // BORRAR LA PROPIEDAD DE PASSWORD PARA QUE NO SE PUEDA EDITAR
+    delete params.password;
+
+    console.log(idUsuario,params)
+    if(req.user.rol != "ROL_ADMIN"){
+        return res.status(500).send({ mensaje: "Solo el Administrador puede editarlos" })
     }
 
-    var userId = req.params.idU
-    var update = req.body
-
-    delete update.password
-
-    User.findByIdAndUpdate(userId, update, {new: true}, (err, userUpdate)=>{
-        if(err) return res.status(500).send({mensaje: 'Error en la peticion'})
-        if(!userUpdate) return res.status(404).send({mensaje: 'No se ha podido actualizar el usuario'})
-
-        return res.status(200).send(userUpdate)
+    User.findByIdAndUpdate(idUsuario, params, { new: true }, (err, usuarioActualizado)=>{
+        if(err) return res.status(500).send({ mensaje: 'Error en la peticion' });
+        if(!usuarioActualizado) return res.status(500).send({ mensaje: 'No se ha podido actualizar al Usuario' });
+        // usuarioActualizado.password = undefined;
+        return res.status(200).send({ usuarioActualizado });
     })
 
-}
+    
+} 
 
 function deleteUserAdmin(req, res){
     var userId = req.params.idU
@@ -209,9 +209,10 @@ function saveUserAdmin(req, res){
         userModel.surname = params.surname
         userModel.user = params.user
         userModel.email = params.email
-        userModel.rol = params.rol
+        userModel.rol = 'ROL_USUARIO'
         userModel.img = 'http://assets.stickpng.com/images/585e4beacb11b227491c3399.png'
-        userModel.carnet = params.carnet
+        userModel.estado =  params.estado
+        userModel.dpi = params.dpi
 
         User.find({
             $or:[
@@ -225,7 +226,7 @@ function saveUserAdmin(req, res){
             }else{
                 bcrypt.hash(params.password, null, null, (err, bcryptPassword)=>{
                     userModel.password = bcryptPassword
-
+                
                     userModel.save((err, userSave)=>{
                         if(err) return res.status(500).send({mensaje: 'Error en la peticion'})
                         if(userSave){
@@ -254,4 +255,4 @@ module.exports = {
     updateUserAdmin,
     deleteUserAdmin,
     saveUserAdmin
-} 
+}

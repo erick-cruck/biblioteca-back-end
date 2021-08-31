@@ -10,20 +10,19 @@ mongoose.connect('mongodb://localhost:27017/BibliotecaVirtualDB', {useNewUrlPars
     .then(()=>{
         console.log('Estas conectado a la base de datos')
 
-        var name = 'ADMIN'
         var user1 = 'adminpractica'
         var email = 'adminpractica'
-        var img = 'https://e7.pngegg.com/pngimages/504/457/png-clipart-computer-icons-icon-public-library-books-miscellaneous-presentation.png'
         var password = 'adminpractica'
         var rol = 'ROL_ADMIN'
 
         var userModel = new User()
 
-        userModel.name = name
+        userModel.img = 'http://assets.stickpng.com/images/585e4beacb11b227491c3399.png'
         userModel.user = user1
         userModel.email = email
-        userModel.img = img
+        userModel.name = user1
         userModel.rol = rol
+        userModel.estado = 'DISPONIBLE'
 
         User.find({email: userModel.email}).exec((err, userStored)=>{
             if(userStored && userStored.length == 1){
@@ -44,8 +43,8 @@ mongoose.connect('mongodb://localhost:27017/BibliotecaVirtualDB', {useNewUrlPars
             }
         }) 
 
-        app.listen(3000, ()=>{
-            console.log('El Servidor esta corriendo en el puerto 3000')
+        app.listen(process.env.PORT || 3000, ()=>{
+            console.log('El Servidor esta corriendo')
         })
     })
-    .catch(err=>console.log(err)) 
+    .catch(err=>console.log(err))
