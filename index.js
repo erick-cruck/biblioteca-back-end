@@ -5,7 +5,7 @@ const app = require("./app");
 const UsuarioControlador = require("./src/controllers/user.controllers")
 
 mongoose.Promise = global.Promise;
-mongoose.connect("mongodb://localhost:27017/BibliotecaVirtualDB", {useNewUrlParser: true, useUnifiedTopology: true}).then(()=>{
+mongoose.connect("mongodb+srv://admin:admin@cluster0.btgbt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", {useNewUrlParser: true, useUnifiedTopology: true}).then(()=>{
     console.log("Se encuentra conectado a la Base de Datos");
     
 
