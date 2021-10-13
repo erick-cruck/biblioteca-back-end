@@ -1,21 +1,25 @@
-'use strict'
+"use strict"
 
-var express = require('express')
-var app = express()
-var bodyParser = require('body-parser')
+//Variables Globales
+const express = require("express");
+const app = express();
+const bodyParser = require("body-parser")
 var cors = require('cors')
 
-//Importaciones de rutas
-var User = require('./src/routs/userRoutes')
+//Rutas
+var UsuariosRutas = require("./src/routs/user.routs")
+var LibrosRutas = require("./src/routs/librera.routs")
 
-//Middlewares
-app.use(bodyParser.urlencoded({extended:false}))
+//Middlewars
+app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
 
 //cors
 app.use(cors())
 
-//rutas
-app.use('/api', User)
+app.use('/api', UsuariosRutas);
+app.use("/api", LibrosRutas);
 
-module.exports = app 
+
+//Exportar
+module.exports = app;
